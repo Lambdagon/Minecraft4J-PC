@@ -100,11 +100,11 @@ void ChoiceTask::handleUIInput(int iAction)
 {
 	if(bHasBeenActivated && m_bShownForMinimumTime)
 	{
-		if( iAction == m_iConfirmMapping || KMInput.IsKeyDown(41))
+		if( iAction == m_iConfirmMapping)
 		{
 			m_bConfirmMappingComplete = true;
 		}
-		else if(iAction == m_iCancelMapping || KMInput.IsKeyDown(42))
+		else if(iAction == m_iCancelMapping)
 		{
 			m_bCancelMappingComplete = true;
 		}
