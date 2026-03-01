@@ -1,0 +1,14 @@
+*.db
+*.vsidx
+.vs/MinecraftConsoles/v18/.suo
+*.obj
+*.tlog
+*.lib
+*.log
+*.binka
+/x64
+/Minecraft.Client/Windows64/GameHDD
+*.db-shm
+/.vs/MinecraftConsoles/v18
+/Minecraft.Client/x64/Release
+/Minecraft.World/x64_Release
