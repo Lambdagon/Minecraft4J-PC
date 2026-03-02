@@ -24,7 +24,7 @@
 #include "..\Minecraft.World\net.minecraft.world.level.storage.h"
 #include "..\Minecraft.World\net.minecraft.world.level.saveddata.h"
 #include "..\Minecraft.World\JavaMath.h"
-#ifdef _XBOX
+#if defined(_XBOX) || defined(_WINDOWS64)
 #include "Xbox\Network\NetworkPlayerXbox.h"
 #elif defined(__PS3__) || defined(__ORBIS__)
 #include "Common\Network\Sony\NetworkPlayerSony.h"
@@ -52,7 +52,11 @@ PlayerList::PlayerList(MinecraftServer *server)
 
     //int viewDistance = server->settings->getInt(L"view-distance", 10);
 
-    maxPlayers = server->settings->getInt(L"max-players", 20);
+#ifdef _WINDOWS64
+	maxPlayers = MINECRAFT_NET_MAX_PLAYERS;
+#else
+	maxPlayers = server->settings->getInt(L"max-players", 20);
+#endif
     doWhiteList = false;
 	
 	InitializeCriticalSection(&m_kickPlayersCS);
@@ -96,7 +100,14 @@ void PlayerList::placeNewPlayer(Connection *connection, shared_ptr<ServerPlayer>
 			}
 		}
 #endif
-
+#ifdef _WINDOWS64
+		if (networkPlayer != NULL && !networkPlayer->IsLocal())
+		{
+			NetworkPlayerXbox* nxp = (NetworkPlayerXbox*)networkPlayer;
+			IQNetPlayer* qnp = nxp->GetQNetPlayer();
+			wcsncpy_s(qnp->m_gamertag, 32, player->name.c_str(), _TRUNCATE);
+		}
+#endif
 		// 4J Stu - TU-1 hotfix
 		// Fix for #13150 - When a player loads/joins a game after saving/leaving in the nether, sometimes they are spawned on top of the nether and cannot mine down
 		validatePlayerSpawnPosition(player);
@@ -421,6 +432,7 @@ void PlayerList::remove(shared_ptr<ServerPlayer> player)
 	//4J Stu - We don't want to save the map data for guests, so when we are sure that the player is gone delete the map
 	if(player->isGuest()) playerIo->deleteMapFilesForPlayer(player);
 	ServerLevel *level = player->getLevel();
+	level->getTracker()->removeEntity(player);
     level->removeEntity(player);
     level->getChunkMap()->remove(player);
 	AUTO_VAR(it, find(players.begin(),players.end(),player));
@@ -441,17 +453,35 @@ void PlayerList::remove(shared_ptr<ServerPlayer> player)
 
 shared_ptr<ServerPlayer> PlayerList::getPlayerForLogin(PendingConnection *pendingConnection, const wstring& userName, PlayerUID xuid, PlayerUID onlineXuid)
 {
-    if (players.size() >= maxPlayers)
+#ifdef _WINDOWS64
+	if (players.size() >= (unsigned int)MINECRAFT_NET_MAX_PLAYERS)
 	{
-        pendingConnection->disconnect(DisconnectPacket::eDisconnect_ServerFull);
-        return shared_ptr<ServerPlayer>();
-    }
+		pendingConnection->disconnect(DisconnectPacket::eDisconnect_ServerFull);
+		return shared_ptr<ServerPlayer>();
+	}
+#else
+	if (players.size() >= maxPlayers)
+	{
+		pendingConnection->disconnect(DisconnectPacket::eDisconnect_ServerFull);
+		return shared_ptr<ServerPlayer>();
+	}
+#endif
 	
 	shared_ptr<ServerPlayer> player = shared_ptr<ServerPlayer>(new ServerPlayer(server, server->getLevel(0), userName, new ServerPlayerGameMode(server->getLevel(0)) ));
 	player->gameMode->player = player; // 4J added as had to remove this assignment from ServerPlayer ctor
 	player->setXuid( xuid ); // 4J Added
 	player->setOnlineXuid( onlineXuid ); // 4J Added
-
+#ifdef _WINDOWS64
+	{
+		INetworkPlayer* np = pendingConnection->connection->getSocket()->getPlayer();
+		if (np != NULL)
+		{
+			PlayerUID realXuid = np->GetUID();
+			player->setXuid(realXuid);
+			player->setOnlineXuid(realXuid);
+		}
+	}
+#endif
 	// Work out the base server player settings
 	INetworkPlayer *networkPlayer = pendingConnection->connection->getSocket()->getPlayer();
 	if(networkPlayer != NULL && !networkPlayer->IsHost())
