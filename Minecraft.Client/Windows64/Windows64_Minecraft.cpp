@@ -1238,7 +1238,8 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 		{
 			if (Minecraft* pMinecraft = Minecraft::GetInstance())
 			{
-				if (pMinecraft->options && app.DebugSettingsOn())
+				if (pMinecraft->options && app.DebugSettingsOn() && 
+					app.GetGameStarted() && !ui.GetMenuDisplayed(0) && pMinecraft->screen == NULL)
 				{
 					ui.NavigateToScene(0, eUIScene_DebugOverlay, NULL, eUILayer_Debug);
 				}
