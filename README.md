@@ -33,6 +33,8 @@ This project contains the source code of Minecraft Legacy Console Edition v1.3.0
 - **Attack / Destroy**: `Left Click`
 - **Use / Place**: `Right Click`
 - **Select Item**: `Mouse Wheel` or keys `1` to `9`
+- **Toggle Debug Info**: `F3`
+- **Open Debug Overlay**: `F4`
 
 ## Build & Run
 
