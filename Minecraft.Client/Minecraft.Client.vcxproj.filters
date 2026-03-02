@@ -723,6 +723,9 @@
     <Filter Include="PSVita\Miles Sound System\lib">
       <UniqueIdentifier>{0061db22-43de-4b54-a161-c43958cdcd7e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Windows64\Source Files\Network">
+      <UniqueIdentifier>{e5d7fb24-25b8-413c-84ec-974bf0d4a3d1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -3628,6 +3631,9 @@
     <ClInclude Include="Common\UI\UIScene_Keyboard.h">
       <Filter>Common\Source Files\UI\Scenes</Filter>
     </ClInclude>
+    <ClInclude Include="Windows64\Network\WinsockNetLayer.h">
+      <Filter>Windows64\Source Files\Network</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -5642,6 +5648,9 @@
     </ClCompile>
     <ClCompile Include="crt_compat.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Windows64\Network\WinsockNetLayer.cpp">
+      <Filter>Windows64\Source Files\Network</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
